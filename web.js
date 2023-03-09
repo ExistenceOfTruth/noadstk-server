@@ -54,9 +54,11 @@ async function cartoon(toonName, epi) {
     const filter = data.find(x => x.epi === epi);
     console.log(filter);
 
+    let view, $;
+
     try {
-        const view = await g(`${filter.link}`);
-        const $ = cheerio.load(view);
+        view = await g(`${filter.link}`);
+        $ = cheerio.load(view);
     }
     catch {
         return 'last'
