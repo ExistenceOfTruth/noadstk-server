@@ -93,9 +93,9 @@ app.get('/:cartoon/', async (req, res) => {
 app.get('/:cartoon/:epi', async(req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
         const data = await cartoon(req.params.cartoon, req.params.epi);
-        res.render('cartoon.ejs', { data });
+        res.render('cartoon.ejs', { data, title: `${req.params.cartoon} - ${req.params.epi}`, prev: `/${req.params.cartoon}/${Number(req.params.epi)-1}`, after: `/${req.params.cartoon}/${Number(req.params.epi)+1}` });
     }
     else {
-        res.send('false')
+        res.redirect(`/${req.params.cartoon}`);
     }
 });
