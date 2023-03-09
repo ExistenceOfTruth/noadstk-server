@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <span class="title">NOADS</span>
+        <button onclick="window.location.href='/'">홈으로</button>
+    </header>
+    <div class="container">
+        <div class="view">
+            <ul>
+                <% for (let i = 0; i < data.length; i++) { %>
+                    <li onclick="window.open().location.href='/<%= data[i].name %>'">
+                        <img src="<%= data[i].img %>" alt="">
+                        <span><%= data[i].name %> / <%= data[i].lastEpi %>화</span>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

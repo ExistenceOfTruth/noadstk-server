@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Genos:wght@600&family=Noto+Sans+KR&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        html,
+        body {
+            background-color: #eee;
+        }
+
+        img {
+            margin: 0 auto;
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            object-fit: contain;
+        }
+
+        .footer {
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .footer button {
+            width: 100%;
+            height: 80px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="imgs"></div>
+        <script>
+        function replaceAll(str, searchStr, replaceStr) {
+            return str.split(searchStr).join(replaceStr);
+        }
+        const tmp = replaceAll(window.atob('<%= data %>'), 'src="', 'src="https://toonkor193.com');
+        $('.imgs').html(tmp);
+    </script>
+</body>
+
+</html>
