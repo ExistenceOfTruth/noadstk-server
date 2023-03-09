@@ -54,8 +54,13 @@ async function cartoon(toonName, epi) {
     const filter = data.find(x => x.epi === epi);
     console.log(filter);
 
-    const view = await g(`${filter.link}`);
-    const $ = cheerio.load(view);
+    try {
+        const view = await g(`${filter.link}`);
+        const $ = cheerio.load(view);
+    }
+    catch {
+        return 'last'
+    }
 
     function replaceAll(str, searchStr, replaceStr) {
         return str.split(searchStr).join(replaceStr);
@@ -93,9 +98,10 @@ app.get('/:cartoon/', async (req, res) => {
 app.get('/:cartoon/:epi', async(req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
         const data = await cartoon(req.params.cartoon, req.params.epi);
+        if (data == 'last') return res.send('alert("마지막화 입니다.")');
         res.render('cartoon.ejs', { data, list: `/${req.params.cartoon}`, title: `${req.params.cartoon} - ${req.params.epi}`, prev: `/${req.params.cartoon}/${Number(req.params.epi)-1}`, after: `/${req.params.cartoon}/${Number(req.params.epi)+1}` });
     }
     else {
-        res.redirect(`/${req.params.cartoon}`);
+        res.redirect(`/`);
     }
 });
