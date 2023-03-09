@@ -26,7 +26,7 @@ async function cartoonImgList() {
         view = await g(`${base}/${obj[i]}`);
         $ = cheerio.load(view);
 
-        const lastEpi = $('.bt_view2').find('.bt_data').text().trim().split(' ')[1].replace('화', '');
+        const lastEpi = $('.bt_view2').find('.bt_data:last-child').text().trim().split(' ')[1].replace('화', '');
 
         result.push({ name: obj[i], lastEpi, img: base + $('.bt_thumb').children('a').children('img').attr('src') });
     }
@@ -61,7 +61,7 @@ async function cartoon(toonName, epi) {
         $ = cheerio.load(view);
     }
     catch {
-        return 'last'
+        return 'last';
     }
 
     function replaceAll(str, searchStr, replaceStr) {
@@ -71,7 +71,6 @@ async function cartoon(toonName, epi) {
     const text = $($('script')).text();
     const findAndClean = findTextAndReturnRemainder(text,"var toon_img =");
     const result = replaceAll(replaceAll(findAndClean, "'", ''), ' ', '');
-    console.log(result)
 
     return result;
 }
@@ -100,7 +99,7 @@ app.get('/:cartoon/', async (req, res) => {
 app.get('/:cartoon/:epi', async(req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
         const data = await cartoon(req.params.cartoon, req.params.epi);
-        if (data == 'last') return res.send('<script>alert("마지막화 입니다.")</script>');
+        if (data == 'last') return res.send('<script>alert("마지막화 입니다.");</script>');
         res.render('cartoon.ejs', { data, list: `/${req.params.cartoon}`, title: `${req.params.cartoon} - ${req.params.epi}`, prev: `/${req.params.cartoon}/${Number(req.params.epi)-1}`, after: `/${req.params.cartoon}/${Number(req.params.epi)+1}` });
     }
     else {
