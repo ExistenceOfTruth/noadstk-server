@@ -133,7 +133,7 @@ function checkList(arr) {
 app.get('/:cartoon/', async (req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
         const data = await cartoonEpisodeList(req.params.cartoon);
-        res.render('view.ejs', { data: checkList(data) });
+        res.render('view.ejs', { data: data, check: checkList(data) });
     }
     else {
         res.send('false');
