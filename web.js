@@ -117,10 +117,23 @@ app.get('/download/all/:cartoon', async(req, res) => {
     }
 });
 
+
+function checkList(arr) {
+    let result = [];
+    let mixed, tmp;
+    for (let i = 0; i < arr.length; i++) {
+        //title, link, epi
+        mixed = `${arr[i].title}&${arr[i].epi}`;
+        tmp = pageView.find(x => x.key === mixed);
+        if (tmp) result.push({ title: `${arr[i].title} [✔]`, link: arr[i].link, epi: arr[i].epi });
+        else result.push({ title: arr[i].title, link: arr[i].link, epi: arr[i].epi });
+    }
+    return result;
+}
 app.get('/:cartoon/', async (req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
         const data = await cartoonEpisodeList(req.params.cartoon);
-        res.render('view.ejs', { data });
+        res.render('view.ejs', { data: checkList(data) });
     }
     else {
         res.send('false');

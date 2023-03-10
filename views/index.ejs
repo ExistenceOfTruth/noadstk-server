@@ -16,7 +16,7 @@
         <div class="view">
             <ul>
                 <% for (let i = 0; i < data.length; i++) { %>
-                    <li onclick="window.open().location.href='/<%= data[i].name %>'">
+                    <li onclick="window.location.href='/<%= data[i].name %>'">
                         <img src="<%= data[i].img %>" alt="">
                         <span><%= data[i].name %> / <%= data[i].lastEpi %>화</span>
                     </li>
