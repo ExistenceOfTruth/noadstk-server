@@ -9,13 +9,32 @@ app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 const port = 8003;
-app.listen(port, () => console.log(`listening on ${port}`));
+app.listen(port, async() => {
+    console.log(`listening on ${port}`);
+    await loopMainPage();
+});
 
 const obj = ['무신귀환록', '사신표월', '무한의 마법사', '저 그런 인재 아닙니다', '검술명가 막내아들', '구천구검'];
 const base = 'https://toonkor193.com';
 
 async function g(uri) {
     return await axios.get(uri).then(res => res.data);
+}
+
+//redis func without redis
+let mainData = [];
+async function loopMainPage() {
+    mainData = await cartoonImgList();
+    setTimeout(async() => {
+        mainData = await cartoonImgList();
+    }, [43200000]); //12시간
+}
+
+let pageView = [];
+function viewed(name, epi, data) {
+    if (epi === 'last') return;
+    console.log(`pass: ${name} ${epi}`)
+    pageView.push({ key: `${name}&${epi}`, data });
 }
 
 async function cartoonImgList() {
@@ -52,7 +71,6 @@ async function cartoonEpisodeList(toonName) {
 async function cartoon(toonName, epi) {
     const data = await cartoonEpisodeList(toonName);
     const filter = data.find(x => x.epi === epi);
-    console.log(filter);
 
     let view, $;
 
@@ -82,8 +100,7 @@ function findTextAndReturnRemainder(target, variable){
 }
 
 app.get('/', async(req, res) => {
-    const data = await cartoonImgList();
-    res.render('index.ejs', { data });
+    res.render('index.ejs', { data: mainData });
 });
 
 app.get('/:cartoon/', async (req, res) => {
@@ -98,10 +115,18 @@ app.get('/:cartoon/', async (req, res) => {
 
 app.get('/:cartoon/:epi', async(req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
-        const data = await cartoon(req.params.cartoon, req.params.epi);
-        if (data == 'last') return res.send('<script>alert("마지막화 입니다.");</script>');
-        res.render('cartoon.ejs', { data, list: `/${req.params.cartoon}`, title: `${req.params.cartoon} - ${req.params.epi}`, prev: `/${req.params.cartoon}/${Number(req.params.epi)-1}`, after: `/${req.params.cartoon}/${Number(req.params.epi)+1}` });
-    }
+        const tmp = pageView.find(y => y.key === `${req.params.cartoon}&${req.params.epi}`);
+        if (tmp) {
+            res.render('cartoon.ejs', { data: tmp.data, list: `/${req.params.cartoon}`, title: `${req.params.cartoon} - ${req.params.epi}`, prev: `/${req.params.cartoon}/${Number(req.params.epi)-1}`, after: `/${req.params.cartoon}/${Number(req.params.epi)+1}` });
+
+        }
+        else {
+            const data = await cartoon(req.params.cartoon, req.params.epi);
+            if (data == 'last') return res.send('<script>alert("마지막화 입니다.");</script>');
+            viewed(req.params.cartoon, req.params.epi, data);
+            res.render('cartoon.ejs', { data, list: `/${req.params.cartoon}`, title: `${req.params.cartoon} - ${req.params.epi}`, prev: `/${req.params.cartoon}/${Number(req.params.epi)-1}`, after: `/${req.params.cartoon}/${Number(req.params.epi)+1}` });
+        }
+        }
     else {
         res.redirect(`/`);
     }

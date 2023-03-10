@@ -80,6 +80,20 @@
             justify-content: center;
         }
 
+        .footer button {
+            border: 0;
+            background-color: rgba(0, 0, 0, .8);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .footer button:first-child {
+            border-right: 1px solid #fff;
+        }
+        .footer button:last-child {
+            border-left: 1px solid #fff;
+        }
+
         @media screen and (max-width: 560px) {
             header {
                 padding: 0 20px;
@@ -91,7 +105,7 @@
 <body>
     <header>
         <span class="title">NOADS</span>
-        <button onclick="window.location.href='<%= list %>'">홈으로</button>
+        <button onclick="window.location.href='<%= list %>'">목록</button>
     </header>
     <div class="container">
         <div class="imgs"></div>
