@@ -23,10 +23,10 @@
     </header>
     <div class="container">
         <ul>
-            <% for (let i = 0; i < check.length; i++) { %>
-                <li onclick="window.location.href='/<%= check[i].title %>/<%= check[i].epi %>'">
+            <% for (let i = 0; i < data.length; i++) { %>
+                <li onclick="window.location.href='/<%= data[i].title %>/<%= data[i].epi %>'">
                     <span id="name"><%= check[i].title %></span>
-                    <span id="epi"><%= check[i].epi %>화</span>
+                    <span id="epi"><%= data[i].epi %>화</span>
                 </li>
             <% } %>
         </ul>
