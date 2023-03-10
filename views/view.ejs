@@ -5,12 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/view.css">
+    <script>
+        function dataDownload() {
+            alert('회차 개수에 따라 시간이 오래걸릴 수 있습니다.\n확인을 누르시면 다운로드가 시작됩니다');
+            window.location.href='/download/all/<%= data[0].title %>';
+        }
+    </script>
     <title><%= data[0].title %> | 목록</title>
 </head>
 <body>
     <header>
         <span class="title">NOADS</span>
-        <button onclick="window.location.href='/'">홈으로</button>
+        <div style="height: 100%">
+            <button onclick="dataDownload()">모든 데이터 다운</button>
+            <button onclick="window.location.href='/'">홈으로</button>
+        </div>
     </header>
     <div class="container">
         <ul>

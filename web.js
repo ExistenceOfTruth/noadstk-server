@@ -97,6 +97,26 @@ app.get('/', async (req, res) => {
     res.render('index.ejs', { data: mainData });
 });
 
+app.get('/download/all/:cartoon', async(req, res) => {
+    const _cartoon = req.params.cartoon;
+    let mixed;
+    if (obj.find(x => x === _cartoon)) {
+        const allToons = await cartoonEpisodeList(_cartoon);
+        // title, link, epi
+        for (let i = 0; i < allToons.length; i++) {
+            mixed = `${_cartoon}&${allToons[i].epi}`;
+            if (!pageView.find(y => y.key === mixed)) {
+                viewed(_cartoon, allToons[i].epi, await cartoon(_cartoon, allToons[i].epi));
+            }
+        }
+        console.log('all downloaded: ' + _cartoon);
+        res.redirect(`/${_cartoon}`);
+    }
+    else {
+        res.redirect(`/${_cartoon}`);
+    }
+});
+
 app.get('/:cartoon/', async (req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
         const data = await cartoonEpisodeList(req.params.cartoon);
@@ -108,18 +128,18 @@ app.get('/:cartoon/', async (req, res) => {
 });
 
 app.get('/:cartoon/:epi', async (req, res) => {
-    const cartoon = req.params.cartoon; const epi = req.params.epi;
+    const _cartoon = req.params.cartoon; const epi = req.params.epi;
 
-    if (obj.find(x => x === cartoon)) {
-        const tmp = pageView.find(y => y.key === `${cartoon}&${epi}`);
+    if (obj.find(x => x === _cartoon)) {
+        const tmp = pageView.find(y => y.key === `${_cartoon}&${epi}`);
         if (tmp) {
-            res.render('cartoon.ejs', { data: tmp.data, list: `/${cartoon}`, title: `${cartoon} - ${epi}`, prev: `/${cartoon}/${Number(epi) - 1}`, after: `/${cartoon}/${Number(epi) + 1}` });
+            res.render('cartoon.ejs', { data: tmp.data, list: `/${_cartoon}`, title: `${_cartoon} - ${epi}`, prev: `/${_cartoon}/${Number(epi) - 1}`, after: `/${_cartoon}/${Number(epi) + 1}` });
         }
         else {
-            const data = await cartoon(cartoon, epi);
+            const data = await cartoon(_cartoon, epi);
             if (data == 'last') return res.send('<script>alert("마지막화 입니다.");</script>');
-            viewed(cartoon, epi, data);
-            res.render('cartoon.ejs', { data, list: `/${cartoon}`, title: `${cartoon} - ${epi}`, prev: `/${cartoon}/${Number(epi) - 1}`, after: `/${cartoon}/${Number(epi) + 1}` });
+            viewed(_cartoon, epi, data);
+            res.render('cartoon.ejs', { data, list: `/${_cartoon}`, title: `${_cartoon} - ${epi}`, prev: `/${_cartoon}/${Number(epi) - 1}`, after: `/${_cartoon}/${Number(epi) + 1}` });
         }
     }
     else {
