@@ -24,10 +24,17 @@
     <div class="container">
         <ul>
             <% for (let i = 0; i < data.length; i++) { %>
-                <li onclick="window.location.href='/<%= data[i].title %>/<%= data[i].epi %>'">
-                    <span id="name"><%= check[i].title %></span>
-                    <span id="epi"><%= data[i].epi %>화</span>
-                </li>
+                <% if (db.find(x => `${x.title}&${x.epi}` === `${data[i].title}&${data[i].epi}`)) { %>
+                    <li class="db" onclick="window.location.href='/<%= data[i].title %>/<%= data[i].epi %>'">
+                        <span id="name"><%= check[i].title %></span>
+                        <span id="epi"><%= data[i].epi %>화</span>
+                    </li>
+                <% } else { %>
+                    <li onclick="window.location.href='/<%= data[i].title %>/<%= data[i].epi %>'">
+                        <span id="name"><%= check[i].title %></span>
+                        <span id="epi"><%= data[i].epi %>화</span>
+                    </li>
+                <% } %>
             <% } %>
         </ul>
         <br>

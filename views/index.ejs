@@ -5,14 +5,52 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script>
+        $(document).ready(() => $('.top').css({'display': '<%= isCode %>'}));
+        function inCode() {
+            $.ajax({
+                type: 'POST',
+                url: '/api/code',
+                data: {
+                    code: $('#code').val()
+                }
+            }).done((e) => {
+                console.log(e)
+                if (e === 'done') return window.location.reload();
+            });
+        }
+        function check() {
+            $.ajax({
+                type: 'POST',
+                url: '/api/check',
+                data: {}
+            }).done((e) => {
+                alert(e);
+            });
+        }
+    </script>
     <title>NOADS</title>
 </head>
 <body>
     <header>
         <span class="title">NOADS</span>
-        <button onclick="window.location.href='/'">홈으로</button>
+        <div style="height: 100%">
+            <button onclick="check()">코드 확인</button>
+            <button onclick="window.location.href='/'">홈으로</button>
+        </div>
     </header>
     <div class="container">
+        <div class="top">
+            <div class="inner">
+                <p>코드를 입력해 자신이 본 회차를 기억해두세요</p>
+                <small>새로운 코드를 입력시 생성됩니다</small>
+                <div class="in">
+                    <input id="code" type="text">
+                    <button onclick="inCode()">입력</button>
+                </div>
+            </div>
+        </div>
         <div class="view">
             <ul>
                 <% for (let i = 0; i < data.length; i++) { %>
@@ -23,9 +61,6 @@
                 <% } %>
             </ul>
         </div>
-    </div>
-    <div class="footer">
-        본 홈페이지는 툰코의 광고 제거를 위해 만들어졌습니다.
     </div>
 </body>
 </html>

@@ -9,6 +9,21 @@
         <%= title %>
     </title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script>
+        let isVisible = true;
+        function onc() {
+            if (isVisible) {
+                $('header').css({ 'display': 'none' });
+                $('.footer').css({ 'display': 'none' });
+                isVisible = false;
+            }
+            else {
+                $('header').css({ 'display': 'flex' });
+                $('.footer').css({ 'display': 'flex' });
+                isVisible = true;
+            }
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Genos:wght@600&family=Noto+Sans+KR&display=swap');
 
@@ -62,6 +77,10 @@
             background-color: #eee;
         }
 
+        .imgs {
+            user-select: none;
+        }
+
         img {
             margin: 0 auto;
             display: block;
@@ -108,7 +127,7 @@
         <button onclick="window.location.href='<%= list %>'">목록</button>
     </header>
     <div class="container">
-        <div class="imgs"></div>
+        <div class="imgs" onclick="onc()"></div>
         <div class="footer">
             <button style="width: 50%; height: 40px;" onclick="window.location.href='<%= prev %>'">이전화</button>
             <button style="width: 50%; height: 40px;" onclick="window.location.href='<%= after %>'">다음화</button>

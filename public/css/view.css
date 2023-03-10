@@ -66,6 +66,10 @@ li:hover {
     box-shadow: 0 0 6px rgba(0, 0, 0, .4);
 }
 
+.db {
+    color: #0085ff;
+}
+
 @media screen and (max-width: 560px) {
     header {
         padding: 0 20px;

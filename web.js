@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -8,12 +9,26 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+}));
 const port = 8003;
 app.listen(port, async () => {
     console.log(`listening on ${port}`);
     customInterval(43200, async () => mainData = await cartoonImgList());
 
 });
+
+const mongoose = require('mongoose');
+mongoose.connect('mongodb+srv://parhan:sr0Z70ukXlQqkJzL@cluster0.ixj2tbm.mongodb.net/?retryWrites=true&w=majority',
+    { useNewUrlParser: true, useUnifiedTopology: true });
+const schema = mongoose.Schema;
+const views = mongoose.model("views", new schema({
+    code: String,
+    viewed: Array
+}));
 
 const obj = ['무신귀환록', '사신표월', '무한의 마법사', '저 그런 인재 아닙니다', '검술명가 막내아들', '구천구검'];
 const base = 'https://toonkor193.com';
@@ -44,6 +59,7 @@ async function cartoonImgList() {
         const lastEpi = $('.bt_view2').find('.bt_data:last-child').text().trim().split(' ')[1].replace('화', '');
         result.push({ name: obj[i], lastEpi, img: base + $('.bt_thumb').children('a').children('img').attr('src') });
     }
+    console.log('reload img');
     return result;
 }
 
@@ -93,8 +109,39 @@ function findTextAndReturnRemainder(target, variable) {
     return result;
 }
 
+app.post('/api/code', (req, res) => {
+    const code = req.body.code;
+    if (code.length == 0) return res.send('n');
+    views.findOne({ code }).then(r => {
+        if (r == null) {
+            new views({
+                code,
+                viewed: []
+            }).save().then(() => {
+                req.session.code = code;
+                res.send('done');
+            });
+        }
+        else {
+            req.session.code = code;
+            res.send('done');
+        }
+    });
+});
+
+app.post('/api/check', (req, res) => {
+    res.send(req.session.code === undefined ? '없음' : req.session.code);
+});
+
 app.get('/', async (req, res) => {
-    res.render('index.ejs', { data: mainData });
+
+
+    if (mainData === undefined) return res.send('서버가 재정비중입니다. 잠시만 기다려주세요');
+
+    res.render('index.ejs', { 
+        data: mainData,
+        isCode: req.session.code===undefined?'flex':'none'
+    });
 });
 
 app.get('/download/all/:cartoon', async(req, res) => {
@@ -130,10 +177,19 @@ function checkList(arr) {
     }
     return result;
 }
+async function checkDB(req) {
+    let result = [];
+    if (req.session.code) result = await views.findOne({ code: req.session.code }).then(data =>  data.viewed);
+    return result;
+}
 app.get('/:cartoon/', async (req, res) => {
     if (obj.find(x => x === req.params.cartoon)) {
         const data = await cartoonEpisodeList(req.params.cartoon);
-        res.render('view.ejs', { data: data, check: checkList(data) });
+        
+        const db = await checkDB(req);
+        console.log(db)
+
+        res.render('view.ejs', { data: data, check: checkList(data), db });
     }
     else {
         res.send('false');
@@ -142,8 +198,14 @@ app.get('/:cartoon/', async (req, res) => {
 
 app.get('/:cartoon/:epi', async (req, res) => {
     const _cartoon = req.params.cartoon; const epi = req.params.epi;
-
     if (obj.find(x => x === _cartoon)) {
+        if (req.session.code) {
+            views.findOne({ code: req.session.code }).then(async(t) => {
+                if (t != null) {
+                    if (!t.viewed.find(x => `${x.title}&${x.epi}` === `${_cartoon}&${epi}`)) await views.updateOne({ code: req.session.code }, { $push: { viewed: { title: _cartoon, epi } } });
+                }
+            })
+        }
         const tmp = pageView.find(y => y.key === `${_cartoon}&${epi}`);
         if (tmp) {
             res.render('cartoon.ejs', { data: tmp.data, list: `/${_cartoon}`, title: `${_cartoon} - ${epi}`, prev: `/${_cartoon}/${Number(epi) - 1}`, after: `/${_cartoon}/${Number(epi) + 1}` });
