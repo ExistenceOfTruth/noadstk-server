@@ -29,13 +29,20 @@
                 alert(e);
             });
         }
+        function search() {
+            window.location.href=`/${$("#searchIn").val()}`;
+        }
     </script>
     <title>NOADS</title>
 </head>
 <body>
     <header>
         <span class="title">NOADS</span>
-        <div style="height: 100%">
+        <div class="search">
+            <input id="searchIn" type="text">
+            <button onclick="search()">검색</button>
+        </div>
+        <div class="bts" style="height: 100%">
             <button onclick="check()">코드 확인</button>
             <button onclick="window.location.href='/'">홈으로</button>
         </div>
@@ -46,21 +53,29 @@
                 <p>코드를 입력해 자신이 본 회차를 기억해두세요</p>
                 <small>새로운 코드를 입력시 생성됩니다</small>
                 <div class="in">
-                    <input id="code" type="text">
+                    <input id="code" spellcheck="false"  type="text">
                     <button onclick="inCode()">입력</button>
                 </div>
             </div>
         </div>
         <div class="view">
             <ul>
-                <% for (let i = 0; i < data.length; i++) { %>
-                    <li onclick="window.location.href='/<%= data[i].name %>'">
-                        <img src="<%= data[i].img %>" alt="">
-                        <span><%= data[i].name %> / <%= data[i].lastEpi %>화</span>
+                <% for (let i = 0; i < follow.length; i++) { %>
+                    <li style="background-image: url('<%= follow[i].img %>');" onclick="window.location.href='/<%= follow[i].title %>'">
+                        <span><%= follow[i].title %></span>
                     </li>
                 <% } %>
             </ul>
         </div>
     </div>
+    <!--js-->
+    <script>
+        $("#code").keydown(e => {
+            if (e.keyCode == 13) inCode();
+        });
+        $("#searchIn").keydown(e => {
+            if (e.keyCode == 13) search();
+        });
+    </script>
 </body>
 </html>

@@ -5,10 +5,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/view.css">
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+
     <script>
         function dataDownload() {
             alert('회차 개수에 따라 시간이 오래걸릴 수 있습니다.\n확인을 누르시면 다운로드가 시작됩니다');
             window.location.href='/download/all/<%= data[0].title %>';
+        }
+        function following() {
+            if ('<%= follow %>' != '') return;
+            $.ajax({
+                type: 'POST',
+                url: '/api/follow',
+                data: {
+                    name: '<%= data[0].title %>'   
+                }
+            }).done(() => {
+                window.location.reload();
+            })
         }
     </script>
     <title><%= data[0].title %> | 목록</title>
@@ -22,6 +36,9 @@
         </div>
     </header>
     <div class="container">
+        <div onclick="following()" class="follow <%= follow ? 'ch' : '' %>">
+            <%= follow ? '즐겨찾기에 추가됨' : '즐겨찾기에 추가' %>
+        </div>
         <ul>
             <% for (let i = 0; i < data.length; i++) { %>
                 <% if (db.find(x => `${x.title}&${x.epi}` === `${data[i].title}&${data[i].epi}`)) { %>

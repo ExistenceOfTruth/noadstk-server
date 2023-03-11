@@ -17,8 +17,6 @@ app.use(session({
 const port = 8003;
 app.listen(port, async () => {
     console.log(`listening on ${port}`);
-    customInterval(43200, async () => mainData = await cartoonImgList());
-
 });
 
 const mongoose = require('mongoose');
@@ -31,7 +29,6 @@ const views = mongoose.model("views", new schema({
     viewed: Array
 }));
 
-const obj = ['무신귀환록', '사신표월', '무한의 마법사', '저 그런 인재 아닙니다', '검술명가 막내아들', '구천구검'];
 const base = 'https://toonkor193.com';
 
 async function g(uri) {
@@ -51,6 +48,10 @@ function viewed(name, epi, data) {
     pageView.push({ key: `${name}&${epi}`, data });
 }
 
+async function isFollow(code, name) {
+    return await (await getFollowList(code)).find(x => x.title === name); 
+}
+
 async function isCartoon(name) {
     let result = [];
     try {
@@ -66,25 +67,14 @@ function isSave(unique) {
     return pageView.find(x => x.key === unique);
 }
 
-async function getFollowList() {
-    let result = undefined;
-    if (req.session.code) {
-        result = await views.findOne({ code: req.session.code }).then(res => res.follow);
-    }
-    return result;
+async function getFollowList(code) {
+    return await views.findOne({ code }).then(res => res.follow);
 }
 
-async function cartoonImgList() {
-    let result = [];
-    let view, $;
-    for (let i = 0; i < obj.length; i++) {
-        view = await g(`${base}/${obj[i]}`);
-        $ = cheerio.load(view);
-        const lastEpi = $('.bt_view2').find('.bt_data:last-child').text().trim().split(' ')[1].replace('화', '');
-        result.push({ name: obj[i], lastEpi, img: base + $('.bt_thumb').children('a').children('img').attr('src') });
-    }
-    console.log('reload img');
-    return result;
+async function getImg(name) {
+    const view = await g(`${base}/${name}`);
+    const $ = cheerio.load(view);
+    return base + $(".bt_thumb").children('a').children('img').attr('src');
 }
 
 async function cartoonEpisodeList(toonName) {
@@ -158,20 +148,37 @@ app.post('/api/check', (req, res) => {
     res.send(req.session.code === undefined ? '없음' : req.session.code);
 });
 
+app.post('/api/search', (req, res) => {
+    res.redirect(`/${req.params.name}`);
+});
+
+app.post('/api/follow', async(req, res) => {
+    console.log('follow update')
+    if (req.session.code) {
+        await views.findOne({ code: req.session.code }).then(async (t) => {
+            if (t != null) {
+                const img = await getImg(req.body.name);
+                await views.updateOne({ code: req.session.code }, { $push: { follow: { title: req.body.name, img } } });
+            }
+        })
+    }
+    res.send('done');
+});
+
 app.get('/', async (req, res) => {
 
 
-    if (mainData === undefined) return res.send('서버가 재정비중입니다. 잠시만 기다려주세요');
+    const code = req.session.code;
+    let follow = code ? await getFollowList(code) : [];
 
-    res.render('index.ejs', { 
-        data: mainData,
-        isCode: req.session.code===undefined?'flex':'none'
+    res.render('index.ejs', {
+        follow,
+        isCode: req.session.code === undefined ? 'flex' : 'none'
     });
 });
 
-app.get('/download/all/:cartoon', async(req, res) => {
+app.get('/download/all/:cartoon', async (req, res) => {
     const _cartoon = req.params.cartoon;
-    let mixed;
     if (obj.find(x => x === _cartoon)) {
         const allToons = await cartoonEpisodeList(_cartoon);
         // title, link, epi
@@ -191,7 +198,7 @@ app.get('/download/all/:cartoon', async(req, res) => {
 
 function checkList(arr) {
     let result = [];
-    let mixed, tmp;
+    let tmp;
     for (let i = 0; i < arr.length; i++) {
         //title, link, epi
         tmp = isSave(`${arr[i].title}&${arr[i].epi}`);
@@ -202,28 +209,28 @@ function checkList(arr) {
 }
 async function checkDB(req) {
     let result = [];
-    if (req.session.code) result = await views.findOne({ code: req.session.code }).then(data =>  data.viewed);
+    if (req.session.code) result = await views.findOne({ code: req.session.code }).then(data => data.viewed);
     return result;
 }
 app.get('/:cartoon/', async (req, res) => {
-    if (obj.find(x => x === req.params.cartoon)) {
+    try {
         const data = await cartoonEpisodeList(req.params.cartoon);
         
         const db = await checkDB(req);
 
+        const follow = req.session.code ? await isFollow(req.session.code, req.params.cartoon) : false;
+        console.log(follow)
         console.log(`rendered: ${req.params.cartoon}`);
-        res.render('view.ejs', { data: data, check: checkList(data), db });
+        res.render('view.ejs', { data, check: checkList(data), db, follow });
     }
-    else {
-        res.send('false');
-    }
+    catch { res.send('false') }
 });
 
 app.get('/:cartoon/:epi', async (req, res) => {
     const _cartoon = req.params.cartoon; const epi = req.params.epi;
-    if (obj.find(x => x === _cartoon)) {
+    try {
         if (req.session.code) {
-            views.findOne({ code: req.session.code }).then(async(t) => {
+            views.findOne({ code: req.session.code }).then(async (t) => {
                 if (t != null) {
                     if (!t.viewed.find(x => `${x.title}&${x.epi}` === `${_cartoon}&${epi}`)) await views.updateOne({ code: req.session.code }, { $push: { viewed: { title: _cartoon, epi } } });
                 }
@@ -240,7 +247,5 @@ app.get('/:cartoon/:epi', async (req, res) => {
             res.render('cartoon.ejs', { data, list: `/${_cartoon}`, title: `${_cartoon} - ${epi}`, prev: `/${_cartoon}/${Number(epi) - 1}`, after: `/${_cartoon}/${Number(epi) + 1}` });
         }
     }
-    else {
-        res.redirect(`/`);
-    }
+    catch {}
 });
