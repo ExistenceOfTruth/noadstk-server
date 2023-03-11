@@ -16,7 +16,7 @@ header {
     padding: 0 120px;
     color: #fff;
     background-color: #232F3E;
-
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
