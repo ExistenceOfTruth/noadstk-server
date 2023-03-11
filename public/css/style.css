@@ -175,5 +175,6 @@ ul li:hover {
     }
     .search {
         justify-content: center;
+        padding-left: 0;
     }
 }
