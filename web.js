@@ -27,6 +27,7 @@ mongoose.connect('mongodb+srv://parhan:sr0Z70ukXlQqkJzL@cluster0.ixj2tbm.mongodb
 const schema = mongoose.Schema;
 const views = mongoose.model("views", new schema({
     code: String,
+    follow: Array,
     viewed: Array
 }));
 
@@ -48,6 +49,29 @@ function viewed(name, epi, data) {
     if (epi === 'last') return;
     console.log(`pass: ${name} ${epi}`)
     pageView.push({ key: `${name}&${epi}`, data });
+}
+
+async function isCartoon(name) {
+    let result = [];
+    try {
+        result = await cartoonEpisodeList(name);
+    }
+    catch {
+        return undefined;
+    }
+    return result;
+}
+
+function isSave(unique) {
+    return pageView.find(x => x.key === unique);
+}
+
+async function getFollowList() {
+    let result = undefined;
+    if (req.session.code) {
+        result = await views.findOne({ code: req.session.code }).then(res => res.follow);
+    }
+    return result;
 }
 
 async function cartoonImgList() {
@@ -116,6 +140,7 @@ app.post('/api/code', (req, res) => {
         if (r == null) {
             new views({
                 code,
+                follow: [],
                 viewed: []
             }).save().then(() => {
                 req.session.code = code;
@@ -151,8 +176,7 @@ app.get('/download/all/:cartoon', async(req, res) => {
         const allToons = await cartoonEpisodeList(_cartoon);
         // title, link, epi
         for (let i = 0; i < allToons.length; i++) {
-            mixed = `${_cartoon}&${allToons[i].epi}`;
-            if (!pageView.find(y => y.key === mixed)) {
+            if (!isSave(`${_cartoon}&${allToons[i].epi}`)) {
                 viewed(_cartoon, allToons[i].epi, await cartoon(_cartoon, allToons[i].epi));
             }
         }
@@ -170,8 +194,7 @@ function checkList(arr) {
     let mixed, tmp;
     for (let i = 0; i < arr.length; i++) {
         //title, link, epi
-        mixed = `${arr[i].title}&${arr[i].epi}`;
-        tmp = pageView.find(x => x.key === mixed);
+        tmp = isSave(`${arr[i].title}&${arr[i].epi}`);
         if (tmp) result.push({ title: `${arr[i].title} [✔]`, link: arr[i].link, epi: arr[i].epi });
         else result.push({ title: arr[i].title, link: arr[i].link, epi: arr[i].epi });
     }
@@ -187,8 +210,8 @@ app.get('/:cartoon/', async (req, res) => {
         const data = await cartoonEpisodeList(req.params.cartoon);
         
         const db = await checkDB(req);
-        console.log(db)
 
+        console.log(`rendered: ${req.params.cartoon}`);
         res.render('view.ejs', { data: data, check: checkList(data), db });
     }
     else {
@@ -206,7 +229,7 @@ app.get('/:cartoon/:epi', async (req, res) => {
                 }
             })
         }
-        const tmp = pageView.find(y => y.key === `${_cartoon}&${epi}`);
+        const tmp = isSave(`${_cartoon}&${epi}`);
         if (tmp) {
             res.render('cartoon.ejs', { data: tmp.data, list: `/${_cartoon}`, title: `${_cartoon} - ${epi}`, prev: `/${_cartoon}/${Number(epi) - 1}`, after: `/${_cartoon}/${Number(epi) + 1}` });
         }
