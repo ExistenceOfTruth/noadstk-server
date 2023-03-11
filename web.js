@@ -49,7 +49,7 @@ function viewed(name, epi, data) {
 }
 
 async function isFollow(code, name) {
-    return await (await getFollowList(code)).find(x => x.title === name); 
+    return await (await getFollowList(code)).find(x => x.title === name);
 }
 
 async function isCartoon(name) {
@@ -152,7 +152,7 @@ app.post('/api/search', (req, res) => {
     res.redirect(`/${req.params.name}`);
 });
 
-app.post('/api/follow', async(req, res) => {
+app.post('/api/follow', async (req, res) => {
     console.log('follow');
     if (req.session.code) {
         await views.findOne({ code: req.session.code }).then(async (t) => {
@@ -165,7 +165,7 @@ app.post('/api/follow', async(req, res) => {
     res.send('done');
 });
 
-app.post('/api/unfollow', async(req, res) => {
+app.post('/api/unfollow', async (req, res) => {
     console.log('unfollow');
     if (req.session.code) {
         await views.findOneAndUpdate({ code: req.session.code }, { $pull: { follow: { title: req.body.name } } });
@@ -187,20 +187,15 @@ app.get('/', async (req, res) => {
 
 app.get('/download/all/:cartoon', async (req, res) => {
     const _cartoon = req.params.cartoon;
-    if (obj.find(x => x === _cartoon)) {
-        const allToons = await cartoonEpisodeList(_cartoon);
-        // title, link, epi
-        for (let i = 0; i < allToons.length; i++) {
-            if (!isSave(`${_cartoon}&${allToons[i].epi}`)) {
-                viewed(_cartoon, allToons[i].epi, await cartoon(_cartoon, allToons[i].epi));
-            }
+    const allToons = await cartoonEpisodeList(_cartoon);
+    // title, link, epi
+    for (let i = 0; i < allToons.length; i++) {
+        if (!isSave(`${_cartoon}&${allToons[i].epi}`)) {
+            viewed(_cartoon, allToons[i].epi, await cartoon(_cartoon, allToons[i].epi));
         }
-        console.log('all downloaded: ' + _cartoon);
-        res.redirect(`/${_cartoon}`);
     }
-    else {
-        res.redirect(`/${_cartoon}`);
-    }
+    console.log('all downloaded: ' + _cartoon);
+    res.redirect(`/${_cartoon}`);
 });
 
 
@@ -255,5 +250,5 @@ app.get('/:cartoon/:epi', async (req, res) => {
             res.render('cartoon.ejs', { data, list: `/${_cartoon}`, title: `${_cartoon} - ${epi}`, prev: `/${_cartoon}/${Number(epi) - 1}`, after: `/${_cartoon}/${Number(epi) + 1}` });
         }
     }
-    catch {}
+    catch { }
 });
