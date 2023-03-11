@@ -223,7 +223,7 @@ async function checkDB(req) {
 app.get('/:cartoon/', async (req, res) => {
     try {
         const data = await cartoonEpisodeList(req.params.cartoon);
-        
+        if (data[0].title === undefined) return res.send('<script>alert("존재하지 않는 웹툰입니다. 검색어를 다시 확인해주세요");history.back();</script>');
         const db = await checkDB(req);
 
         const follow = req.session.code ? await isFollow(req.session.code, req.params.cartoon) : false;
@@ -231,7 +231,7 @@ app.get('/:cartoon/', async (req, res) => {
         console.log(`rendered: ${req.params.cartoon}`);
         res.render('view.ejs', { data, check: checkList(data), db, follow });
     }
-    catch { res.send('false') }
+    catch { res.send('<script>alert("존재하지 않는 웹툰입니다. 검색어를 다시 확인해주세요");history.back();</script>'); }
 });
 
 app.get('/:cartoon/:epi', async (req, res) => {
