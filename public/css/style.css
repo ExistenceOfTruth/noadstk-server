@@ -82,7 +82,7 @@ ul li span {
     bottom: 5px;
     left: 5px;
     background-color: rgba(0, 0, 0, .8);
-    padding: 5px;
+    padding: 5px 8px;
     border-radius: 14px;
 }
 ul li:hover {
@@ -90,18 +90,20 @@ ul li:hover {
 }
 
 .search {
-    height: 100%;    
+    height: auto; 
+    background-color: #fff;
     width: 100%;
-    padding: 5px 0;
+    padding: 10px 0;
+    padding-left: 30px;
     display: flex;
     align-items: center;
-    justify-content: center;
     flex: 1;
 }
 .search input {
     background-color: #eee;
     outline: none;
     padding: 5px;
+    width: 250px;
     border: none;
     border-radius: 0;
     border-top-left-radius: 4px;
@@ -170,5 +172,8 @@ ul li:hover {
     }
     .view img {
         width: 120px;
+    }
+    .search {
+        justify-content: center;
     }
 }
