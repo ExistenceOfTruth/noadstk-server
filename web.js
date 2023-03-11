@@ -153,7 +153,7 @@ app.post('/api/search', (req, res) => {
 });
 
 app.post('/api/follow', async(req, res) => {
-    console.log('follow update')
+    console.log('follow');
     if (req.session.code) {
         await views.findOne({ code: req.session.code }).then(async (t) => {
             if (t != null) {
@@ -164,6 +164,14 @@ app.post('/api/follow', async(req, res) => {
     }
     res.send('done');
 });
+
+app.post('/api/unfollow', async(req, res) => {
+    console.log('unfollow');
+    if (req.session.code) {
+        await views.findOneAndUpdate({ code: req.session.code }, { $pull: { follow: { title: req.body.name } } });
+    }
+    res.send('done');
+})
 
 app.get('/', async (req, res) => {
 

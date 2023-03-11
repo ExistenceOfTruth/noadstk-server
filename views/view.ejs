@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/view.css">
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
@@ -12,8 +13,17 @@
             alert('회차 개수에 따라 시간이 오래걸릴 수 있습니다.\n확인을 누르시면 다운로드가 시작됩니다');
             window.location.href='/download/all/<%= data[0].title %>';
         }
+        function unfollowing() {
+            $.ajax({
+                type: 'POST',
+                url: '/api/unfollow',
+                data: {
+                    name: '<%= data[0].title %>'
+                }
+            }).done(() => window.location.reload());
+        }
         function following() {
-            if ('<%= follow %>' != '') return;
+            if ('<%= follow %>' != '') return unfollowing();
             $.ajax({
                 type: 'POST',
                 url: '/api/follow',
@@ -37,7 +47,7 @@
     </header>
     <div class="container">
         <div onclick="following()" class="follow <%= follow ? 'ch' : '' %>">
-            <%= follow ? '즐겨찾기에 추가됨' : '즐겨찾기에 추가' %>
+            <span class="fa fa-star <%= follow ? 'checked' : '' %>"></span>&nbsp;<%= follow ? '팔로잉' : '팔로우' %>
         </div>
         <ul>
             <% for (let i = 0; i < data.length; i++) { %>
