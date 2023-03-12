@@ -86,8 +86,9 @@ async function cartoonEpisodeList(toonName) {
     ff.each((i, e) => {
         const title = toonName;
         const link = base + $(e).attr('data-role');
+        const vTitle = $(e).text().trim().replace($(e).text().trim().split(' ').pop(), '');
         const epi = $(e).text().trim().split(' ').pop().replace('화', '').includes(')') ? $(e).text().trim().split(' ').pop().replace('화', '').replace(')', '') : $(e).text().trim().split(' ').pop().replace('화', '');
-        result.push({ title, link, epi });
+        result.push({ title, vTitle, link, epi });
     });
     return result;
 }
@@ -209,18 +210,6 @@ app.get('/download/all/:cartoon', async (req, res) => {
     res.redirect(`/${_cartoon}`);
 });
 
-
-function checkList(arr) {
-    let result = [];
-    let tmp;
-    for (let i = 0; i < arr.length; i++) {
-        //title, link, epi
-        tmp = isSave(`${arr[i].title}&${arr[i].epi}`);
-        if (tmp) result.push({ title: `${arr[i].title} [✔]`, link: arr[i].link, epi: arr[i].epi });
-        else result.push({ title: arr[i].title, link: arr[i].link, epi: arr[i].epi });
-    }
-    return result;
-}
 async function checkDB(req) {
     let result = [];
     if (req.session.code) result = await views.findOne({ code: req.session.code }).then(data => data.viewed);
@@ -235,7 +224,7 @@ app.get('/:cartoon/', async (req, res) => {
         const follow = req.session.code ? await isFollow(req.session.code, req.params.cartoon) : false;
         console.log(follow)
         console.log(`rendered: ${req.params.cartoon}`);
-        res.render('view.ejs', { data, check: checkList(data), db, follow });
+        res.render('view.ejs', { data, db, follow });
     }
     catch { res.send('<script>alert("존재하지 않는 웹툰입니다. 검색어를 다시 확인해주세요");history.back();</script>'); }
 });
