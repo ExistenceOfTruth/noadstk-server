@@ -159,7 +159,6 @@ app.post('/api/destroy', async(req, res) => {
 });
 
 app.post('/api/follow', async (req, res) => {
-    console.log('follow');
     if (req.session.code) {
         await views.findOne({ code: req.session.code }).then(async (t) => {
             if (t != null) {
@@ -222,7 +221,6 @@ app.get('/:cartoon/', async (req, res) => {
         const db = await checkDB(req);
 
         const follow = req.session.code ? await isFollow(req.session.code, req.params.cartoon) : false;
-        console.log(follow)
         console.log(`rendered: ${req.params.cartoon}`);
         res.render('view.ejs', { data, db, follow });
     }
