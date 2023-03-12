@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="/css/view.css">
     <!--js-->
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     <script>
         function dataDownload() {
             alert('회차 개수에 따라 시간이 오래걸릴 수 있습니다.\n확인을 누르시면 다운로드가 시작됩니다');
@@ -49,10 +48,10 @@
     </header>
     <div class="container">
         <div class="arrow-up" onclick="window.scrollTo(0, 0);">
-            <span class="fas fa-angle-double-up"></span>
+            <span class="fa fa-angle-double-up"></span>
         </div>
         <div class="arrow-down" onclick="window.scrollTo(0, document.body.scrollHeight);">
-            <span class="fas fa-angle-double-down"></span>
+            <span class="fa fa-angle-double-down"></span>
         </div>
         <div onclick="following()" class="follow <%= follow ? 'ch' : '' %>">
             <span class="fa fa-star <%= follow ? 'checked' : '' %>"></span>&nbsp;<%= follow ? '팔로잉' : '팔로우' %>

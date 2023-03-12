@@ -87,23 +87,20 @@ li:hover {
     background-color: rgba(0, 0, 0, .6);
 }
 
-.arrow-up {
+.arrow-up, .arrow-down {
     position: fixed;
-    bottom: 70px; right: 20px;
     padding: 10px; background-color: #fff;
     width: 44px; height: 44px;
     border-radius: 50%;
     display: flex; justify-content: center; align-items: center;
     cursor: pointer;
 }
+
+.arrow-up {
+    bottom: 70px; right: 20px;
+}
 .arrow-down {
-    position: fixed;
     bottom: 20px; right: 20px;
-    padding: 10px; background-color: #fff;
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    cursor: pointer;
 }
 .arrow-up span, .arrow-down span {
     transition-duration: .1s; transition-timing-function: ease-in;
