@@ -152,6 +152,11 @@ app.post('/api/search', (req, res) => {
     res.redirect(`/${req.params.name}`);
 });
 
+app.post('/api/destroy', async(req, res) => {
+    if (req.session.code) await req.session.destroy();
+    res.send('done');
+});
+
 app.post('/api/follow', async (req, res) => {
     console.log('follow');
     if (req.session.code) {
@@ -178,6 +183,12 @@ app.get('/', async (req, res) => {
 
     const code = req.session.code;
     let follow = code ? await getFollowList(code) : [];
+
+    follow.sort((a,b) => {
+        if (a.title < b.title) return -1;
+        if (a > b) return 1;
+        return 0;
+    });
 
     res.render('index.ejs', {
         follow,
