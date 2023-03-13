@@ -170,11 +170,16 @@ app.post('/api/follow', async (req, res) => {
     res.send('done');
 });
 
-app.post('/api/unfollow', async (req, res) => {
-    console.log('unfollow');
+app.post('/api/follow/test', async(req,res) => {
     if (req.session.code) {
-        await views.findOneAndUpdate({ code: req.session.code }, { $pull: { follow: { title: req.body.name } } });
+        const img = await getImg(req.body.name);
+        await views.findOneAndUpdate({ code: req.session.code }, { $push: { follow: { title: req.body.name, img } } });
     }
+    res.send('done');
+})
+
+app.post('/api/unfollow', async (req, res) => {
+    if (req.session.code) await views.findOneAndUpdate({ code: req.session.code }, { $pull: { follow: { title: req.body.name } } });
     res.send('done');
 })
 
