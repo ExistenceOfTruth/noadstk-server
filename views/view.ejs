@@ -60,10 +60,11 @@
         <div class="arrow-down" onclick="window.scrollTo(0, document.body.scrollHeight);">
             <span class="fa fa-angle-double-down"></span>
         </div>
-        <div onclick="following()" class="follow <%= follow ? 'ch' : '' %>">
-            <span class="fa fa-star <%= follow ? 'checked' : '' %>"></span>&nbsp;<%= follow ? '팔로잉' : '팔로우' %>
-        </div>
         <ul>
+            <div class="thumb" style="background-image: url('<%= img %>');">
+                <div onclick="following()" class="follow <%= follow ? 'ch' : '' %>">
+                <span class="fa fa-star <%= follow ? 'checked' : '' %>"></span></div>
+            </div>
             <% for (let i=0; i < data.length; i++) { %>
                 <% if (db.find(x=> `${x.title}&${x.epi}` === `${data[i].title}&${data[i].epi}`)) { %>
                     <li class="db" onclick="window.location.href='/<%= data[i].title %>/<%= data[i].epi %>'">

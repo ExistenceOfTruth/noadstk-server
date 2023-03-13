@@ -29,7 +29,7 @@ const views = mongoose.model("views", new schema({
     viewed: Array
 }));
 
-const base = 'https://toonkor193.com';
+const base = 'https://toonkor194.com';
 
 async function g(uri) {
     return await axios.get(uri).then(res => res.data);
@@ -41,7 +41,7 @@ const customInterval = (sec, callback) => {
 }
 
 //simillar redis
-let mainData, pageView = [];
+let pageView = [];
 function viewed(name, epi, data) {
     if (epi === 'last') return;
     console.log(`pass: ${name} ${epi}`)
@@ -219,10 +219,9 @@ app.get('/:cartoon/', async (req, res) => {
         const data = await cartoonEpisodeList(req.params.cartoon);
         if (data[0].title === undefined) return res.send('<script>alert("존재하지 않는 웹툰입니다. 검색어를 다시 확인해주세요");history.back();</script>');
         const db = await checkDB(req);
-
         const follow = req.session.code ? await isFollow(req.session.code, req.params.cartoon) : false;
         console.log(`rendered: ${req.params.cartoon}`);
-        res.render('view.ejs', { data, db, follow });
+        res.render('view.ejs', { data, db, follow, img: await getImg(req.params.cartoon) });
     }
     catch { res.send('<script>alert("존재하지 않는 웹툰입니다. 검색어를 다시 확인해주세요");history.back();</script>'); }
 });
