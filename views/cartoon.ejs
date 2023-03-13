@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>
         <%= title %>
     </title>
@@ -14,12 +15,14 @@
         function onc() {
             if (isVisible) {
                 $('header').css({ 'display': 'none' });
-                $('.footer').css({ 'display': 'none' });
+                $('.left').css({ 'display': 'none' });
+                $('.right').css({ 'display': 'none' });
                 isVisible = false;
             }
             else {
                 $('header').css({ 'display': 'flex' });
-                $('.footer').css({ 'display': 'flex' });
+                $('.left').css({ 'display': 'flex' });
+                $('.right').css({ 'display': 'flex' });
                 isVisible = true;
             }
         }
@@ -89,28 +92,26 @@
             object-fit: contain;
         }
 
-        .footer {
-            text-align: center;
+        .left, .right {
+            width: 40px; height: 60px;
+            bottom: 50%;
             position: fixed;
-            bottom: 0;
-            width: 100%;
-
-            display: flex;
-            justify-content: center;
-        }
-
-        .footer button {
             border: 0;
-            background-color: rgba(0, 0, 0, .8);
+            background-color: rgba(0, 0, 0, .6);
             color: #fff;
-            font-weight: bold;
-            cursor: pointer;
+            display: flex;
+            font-size: 20px;
+            justify-content: center; align-items: center;
         }
-        .footer button:first-child {
-            border-right: 1px solid #fff;
+        .left {
+            left: 0;
+            border-top-right-radius: 99px;
+            border-bottom-right-radius: 99px;
         }
-        .footer button:last-child {
-            border-left: 1px solid #fff;
+        .right {
+            right: 0;
+            border-top-left-radius: 99px;
+            border-bottom-left-radius: 99px;
         }
 
         @media screen and (max-width: 560px) {
@@ -128,15 +129,15 @@
     </header>
     <div class="container">
         <div class="imgs" onclick="onc()"></div>
-        <div class="footer">
-            <button style="width: 50%; height: 40px;" onclick="window.location.href='<%= prev %>'">이전화</button>
-            <button style="width: 50%; height: 40px;" onclick="window.location.href='<%= after %>'">다음화</button>
-        </div>
+
+        <button class="left" onclick="window.location.href='<%= prev %>'"><span class="fa fa-angle-double-left"></span></button>
+        <button class="right" onclick="window.location.href='<%= after %>'"><span class="fa fa-angle-double-right"></span></button>
         <script>
             function replaceAll(str, searchStr, replaceStr) {
                 return str.split(searchStr).join(replaceStr);
             }
-            const tmp = replaceAll(window.atob('<%= data %>'), 'src="', 'src="https://toonkor193.com');
+            let tmp = replaceAll(window.atob('<%= data %>'), 'src="', 'src="https://toonkor193.com');
+            tmp = replaceAll(tmp, 'src', 'loading="lazy" src');
             $('.imgs').html(tmp);
         </script>
     </div>
