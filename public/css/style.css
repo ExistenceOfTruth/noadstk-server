@@ -21,7 +21,9 @@ header {
     align-items: center;
     justify-content: space-between;
 }
-
+header .bts {
+    user-select: none;
+}
 header .bts button {
     cursor: pointer;
     height: 100%;
