@@ -134,6 +134,10 @@ li:hover {
         padding: 0;
     }
     li {
-        width: 200px;
+        width: 220px;
+    }
+    .thumb {
+        width: 220px;
+        height: 70px;
     }
 }
